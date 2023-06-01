@@ -15,6 +15,7 @@ namespace DVWA_BruteForce_HighSecurity
             // dotnet run -- --url http://localhost:3000/vulnerabilities/brute/ --username test
             // dotnet run -- --url "http://localhost:3000/vulnerabilities/brute/" --username test
             // dotnet run -- --passwordList "C:\Users\chris\Downloads\PasswordListNewPath.txt"
+            // dotnet run -- --passwordList "C:\Users\chris\Downloads\PasswordList.csv"
             // dotnet run -- --phpSessId nmal50l9m8re9sgnreen7a74e6 --username admin
 
             // TODO: upload as a nuget pacakge with disclaimer. write blog post. 
@@ -40,7 +41,7 @@ namespace DVWA_BruteForce_HighSecurity
             //var phpSessIdOption = new Option<string>(
             //    name: "--phpSessId",
             //    description: "The PHP Session Id to include with the request headers. " +
-            //    "This can be found by using browser DevTools and inspecting the cookies after logging in to DVWA.")
+            //    "This can be found by using browser DevTools and inspecting the cookies set by DVWA.")
             //{ IsRequired = true };
 
             var passwordListOption = new Option<string>(
@@ -85,7 +86,8 @@ namespace DVWA_BruteForce_HighSecurity
             else
             {
                 //Console.WriteLine("Default pass list used");
-                passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
+                //passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
+                passwordList = File.ReadLines("PasswordList.txt").ToList();
                 //var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
                 //var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.csv").ToList();
             }
