@@ -7,8 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PackageId>DVWA_BruteForce_HighSecurity</PackageId>
-	<Version>1.0.0</Version>
+	<Version>1.0.1</Version>
 	<Authors>Chris Brown (Github: https://github.com/ChrisTheGreat1)</Authors>
+	<Description>A CLI tool for bruteforcing the DVWA high-security login page.</Description>
+	<PackAsTool>true</PackAsTool>
+	<PackageOutputPath>./nupkg</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
