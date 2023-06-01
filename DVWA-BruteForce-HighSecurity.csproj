@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PackageId>DVWA_BruteForce_HighSecurity</PackageId>
-	<Version>1.0.1</Version>
+	<Version>1.0.4</Version>
 	<Authors>Chris Brown (Github: https://github.com/ChrisTheGreat1)</Authors>
 	<Description>A CLI tool for bruteforcing the DVWA high-security login page.</Description>
 	<PackAsTool>true</PackAsTool>
@@ -17,9 +17,6 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.0.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-	  <Content Include="PasswordList.txt">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
   </ItemGroup>
 
 </Project>
