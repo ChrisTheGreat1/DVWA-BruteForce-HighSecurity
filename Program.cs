@@ -7,7 +7,7 @@ namespace DVWA_BruteForce_HighSecurity
     {
         static async Task Main(string[] args)
         {
-            // TODO: create command line tack statements, allow for generic user input, allow for specific username attempt, cookie input with example, help option. write blog post.
+            // TODO: create command line tack statements, allow for generic user input, allow for specific username attempt, cookie input with example, built in / default password list, help option. write blog post.
 
             // Initialize password list
             var passwordList = File.ReadLines("C:\\Users\\chris\\Documents\\Programming\\C#\\2023\\DVWA-BruteForce-HighSecurity\\DVWA-BruteForce-HighSecurity\\PasswordList.txt").ToList();
