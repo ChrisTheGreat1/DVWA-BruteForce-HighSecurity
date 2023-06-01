@@ -35,7 +35,11 @@ namespace DVWA_BruteForce_HighSecurity
             rootCommand.AddOption(phpSessIdOption);
             rootCommand.AddOption(passwordListOption);
 
-            rootCommand.SetHandler(async (usernameValue, baseUriValue, phpSessIdValue, passwordListPathValue) =>
+            rootCommand.SetHandler(async (
+                usernameValue, 
+                baseUriValue, 
+                phpSessIdValue, 
+                passwordListPathValue) =>
             {
                 await BruteForceLogin(usernameValue, baseUriValue, phpSessIdValue, passwordListPathValue);
             },
@@ -56,7 +60,7 @@ namespace DVWA_BruteForce_HighSecurity
             var cookieContents = $"PHPSESSID={_phpSessId}; security=high";
 
             List<string> passwordList = new();
-            if(_passwordListPath != null && _passwordListPath != "")
+            if(_passwordListPath != null && _passwordListPath.Length != 0)
             {
                 passwordList = File.ReadLines(_passwordListPath).ToList();
             }
