@@ -18,6 +18,8 @@ View all options/help with the following command:
 
 ![Help command](Images/CLI-Help-option.png)
 
+This repo also includes a CSV and TXT password list file that can be used with the optional `--passwordList` argument.
+
 To uninstall the tool, open a command terminal and enter the following command:
 
 `dotnet tool uninstall --global DVWA_BruteForce_HighSecurity`
