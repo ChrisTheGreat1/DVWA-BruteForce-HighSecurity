@@ -1,6 +1,6 @@
 # DVWA-BruteForce-HighSecurity
 
-This is a C# program I wrote that will automatically brute force login attempts of the high-security setting of the DVWA (Damn Vulnerable Web App) login page. The script will automatically parse for the CSRF token in the page then attempt to login until the correct password is found or the password list is exhausted. ***You can read more about DVWA and this tool in my blog post [here](https://christhegreat1.substack.com/p/writing-a-c-cli-tool-for-dvwa-login).***
+This is a C# program I wrote that will automatically brute force login attempts of the high-security setting of the DVWA (Damn Vulnerable Web App) login page. The script will automatically parse for the CSRF token in the page then attempt to login until the correct password is found or the password list is exhausted. ***You can read more about DVWA and this tool in my blog post [here](https://chrisbrown1.substack.com/p/writing-a-c-cli-tool-for-dvwa-login).***
 
 To use this tool, open a command terminal, then enter the following command to download the package from nuget and install. Note that you must have .NET Core 2.1 SDK or later installed on your machine:
 
